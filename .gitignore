@@ -1,0 +1,37 @@
+# Ignore migration files and folders
+Migrations/
+*.csproj.user
+*.suo
+*.user
+*.dbmdl
+*.bak
+
+# Ignore launch settings
+launchSettings.json
+
+# Ignore build output directories
+bin/
+obj/
+
+# Ignore user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore logs
+*.log
+
+# Ignore temporary files
+*.tmp
+*.swp
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore dependency directories
+node_modules/
+
+# Ignore Visual Studio temporary files
+.vs/
