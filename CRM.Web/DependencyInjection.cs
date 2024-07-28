@@ -59,8 +59,7 @@ internal static class DependencyInjection
         .AddRedis(configuration.GetSection("RedisConfiguration:Connection").Value!, "Redis", HealthStatus.Healthy).Services;
 
     internal static IServiceCollection InjectFluentValidation(this IServiceCollection services) =>
-        services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AddUserDto>());
-
+        services.AddValidatorsFromAssemblyContaining<AddUserDto>().AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 
     internal static IServiceCollection InjectBusinesses(this IServiceCollection services) =>
         services.AddScoped<IAuthorizeBusiness, AuthorizeBusiness>();
