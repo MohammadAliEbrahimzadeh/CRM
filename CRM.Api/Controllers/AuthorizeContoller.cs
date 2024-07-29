@@ -86,4 +86,20 @@ public class AuthorizeContoller : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPost]
+    [Route("SendEmail")]
+    public async Task<IActionResult> SendEmail(CancellationToken cancellation)
+    {
+        var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Confirmation.html");
+
+        if (!Path.Exists(emailTemplatePath))
+        {
+            return BadRequest();
+        }
+
+        var text = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+        return Ok();
+    }
 }

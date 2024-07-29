@@ -1,4 +1,5 @@
-﻿using CRM.Models.Models;
+﻿using CRM.Common.Extentions;
+using CRM.Models.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Emit;
@@ -47,7 +48,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                    Id = 1,
                    Username = "john.doe",
                    Email = "john.doe@example.com",
-                   PasswordHash = "hashedPassword1",
+                   PasswordHash = Generators.HashPassword("hashedPassword1", "abcde"),
                    PasswordSalt = "abcde",
                    IsDeleted = false,
                    CreatedAt = DateTime.Now,
@@ -58,7 +59,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                    Id = 2,
                    Username = "jane.smith",
                    Email = "jane.smith@example.com",
-                   PasswordHash = "hashedPassword2",
+                   PasswordHash = Generators.HashPassword("hashedPassword2", "fghij"),
                    PasswordSalt = "fghij",
                    IsDeleted = false,
                    CreatedAt = DateTime.Now,
@@ -69,7 +70,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                    Id = 3,
                    Username = "admin",
                    Email = "admin@example.com",
-                   PasswordHash = "hashedPassword3",
+                   PasswordHash = Generators.HashPassword("hashedPassword3", "klmno"),
                    PasswordSalt = "klmno",
                    IsDeleted = false,
                    CreatedAt = DateTime.Now,

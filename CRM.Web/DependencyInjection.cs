@@ -56,7 +56,7 @@ internal static class DependencyInjection
         services
         .AddHealthChecks()
         .AddDbContextCheck<CRMContext>("CRMContext", HealthStatus.Unhealthy)
-        .AddRedis(configuration.GetSection("RedisConfiguration:Connection").Value!, "Redis", HealthStatus.Healthy).Services;
+        .AddRedis(configuration.GetSection("RedisConfiguration:Connection").Value!, "Redis", HealthStatus.Unhealthy).Services;
 
     internal static IServiceCollection InjectFluentValidation(this IServiceCollection services) =>
         services.AddValidatorsFromAssemblyContaining<AddUserDto>().AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
