@@ -5,7 +5,7 @@ using CRM.DataAccess.Context;
 using CRM.Models.Models;
 using HotChocolate.Subscriptions;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace CRM.Api.Controllers;
 
@@ -16,12 +16,14 @@ public class AuthorizeContoller : ControllerBase
     private readonly CRMContext _context;
     private readonly ITopicEventSender _eventSender;
     private readonly IAuthorizeBusiness _authorizeBusiness;
+    private readonly IConfiguration _configuration;
 
-    public AuthorizeContoller(CRMContext context, ITopicEventSender eventSender, IAuthorizeBusiness authorizeBusiness)
+    public AuthorizeContoller(CRMContext context, ITopicEventSender eventSender, IAuthorizeBusiness authorizeBusiness, IConfiguration configuration)
     {
         _context = context;
         _eventSender = eventSender;
         _authorizeBusiness = authorizeBusiness;
+        _configuration = configuration;
     }
 
     [HttpPost]
@@ -91,14 +93,20 @@ public class AuthorizeContoller : ControllerBase
     [Route("SendEmail")]
     public async Task<IActionResult> SendEmail(CancellationToken cancellation)
     {
-        var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Confirmation.html");
+        var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "Confirmation.html");
 
         if (!Path.Exists(emailTemplatePath))
         {
             return BadRequest();
         }
 
-        var text = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+        var rnd = new Random();
+
+        var num = rnd.Next(10000, 99999);
+
+        var email = new Sender(_configuration);
+
+        await email.SendEmailAsync("mohammad77.me@gmail.com", "Confirmation", emailTemplatePath, "Asghar", num.ToString());
 
         return Ok();
     }

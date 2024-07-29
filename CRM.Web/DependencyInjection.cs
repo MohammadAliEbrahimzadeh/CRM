@@ -12,6 +12,7 @@ using CRM.Common.DTOs.Authentication;
 using FluentValidation.AspNetCore;
 using CRM.Business.Contracts;
 using CRM.Business.Businesses;
+using CRM.DataAccess.UnitOfWork;
 
 namespace CRM.Web;
 
@@ -63,4 +64,7 @@ internal static class DependencyInjection
 
     internal static IServiceCollection InjectBusinesses(this IServiceCollection services) =>
         services.AddScoped<IAuthorizeBusiness, AuthorizeBusiness>();
+
+    internal static IServiceCollection InjectUnitOfWork(this IServiceCollection services) =>
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 }

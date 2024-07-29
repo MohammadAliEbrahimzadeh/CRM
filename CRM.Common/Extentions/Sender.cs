@@ -1,60 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
+using MimeKit;
 
 namespace CRM.Common.Extentions;
 
 public class Sender
 {
-    private readonly string _templatePath;
-    private readonly string _smtpServer;
-    private readonly int _smtpPort;
-    private readonly string _smtpUser;
-    private readonly string _smtpPass;
+    private readonly IConfiguration _configuration;
 
-    public Sender(string templatePath, string smtpServer, int smtpPort, string smtpUser, string smtpPass)
+    public Sender(IConfiguration configuration)
     {
-        _templatePath = templatePath;
-        _smtpServer = smtpServer;
-        _smtpPort = smtpPort;
-        _smtpUser = smtpUser;
-        _smtpPass = smtpPass;
+        _configuration = configuration;
     }
 
-    public void SendEmailAsync(string to, string subject, string body)
+    public async Task SendEmailAsync(string toAddress, string subject, string path, string name, string code)
     {
-        var fromAddress = new MailAddress(_smtpUser, "Your Company");
-        var toAddress = new MailAddress(to);
-        var smtp = new SmtpClient
+        var message = new MimeMessage();
+
+        message.From.Add(new MailboxAddress("CRM", _configuration.GetSection("EmailConfiguration:Address").Value));
+
+        message.To.Add(new MailboxAddress(string.Empty, toAddress));
+
+        message.Subject = subject;
+
+        var template = await File.ReadAllTextAsync(path);
+
+        var messageBody = template.Replace("{{Name}}", name)
+                       .Replace("{{Code}}", code);
+
+        message.Body = new TextPart("html")
         {
-            Host = _smtpServer,
-            Port = _smtpPort,
-            EnableSsl = true,
-            DeliveryMethod = SmtpDeliveryMethod.Network,
-            UseDefaultCredentials = false,
-            Credentials = new NetworkCredential(_smtpUser, _smtpPass)
+            Text = messageBody
         };
 
-        var message = new MailMessage(fromAddress, toAddress)
-        {
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = true
-        };
+        // Connect and send the email using Gmail's SMTP server
+        var client = new SmtpClient();
 
-        smtp.Send(message);
-    }
+        // Connect to Gmail SMTP server
+        await client.ConnectAsync("smtp.gmail.com", 465, true);
 
+        // Authenticate using your email and app password
+        await client.AuthenticateAsync(_configuration.GetSection("EmailConfiguration:Address").Value,
+            _configuration.GetSection("EmailConfiguration:PassKey").Value);
 
-    public async Task<string> GenerateEmailBody(string name, string code)
-    {
-        var template = await File.ReadAllTextAsync(_templatePath);
-        var body = template.Replace("{{Name}}", name)
-                           .Replace("{{Code}}", code);
-        return body;
+        // Send the email
+        await client.SendAsync(message);
+
+        // Disconnect and quit
+        await client.DisconnectAsync(true);
     }
 }

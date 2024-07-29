@@ -12,7 +12,8 @@ builder.Services
     .InjectHotChocolate()
     .InjectHealthCheck(builder.Configuration)
     .InjectFluentValidation()
-    .InjectBusinesses();
+    .InjectBusinesses()
+    .InjectUnitOfWork();
 
 var app = builder.Build();
 
