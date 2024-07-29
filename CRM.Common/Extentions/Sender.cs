@@ -13,7 +13,9 @@ public class Sender
         _configuration = configuration;
     }
 
-    public async Task SendEmailAsync(string toAddress, string subject, string path, string name, string code)
+    public async Task SendEmailAsync
+        
+        (string toAddress, string subject, string path, string name, string code, CancellationToken cancellationToken)
     {
         var message = new MimeMessage();
 
@@ -23,7 +25,7 @@ public class Sender
 
         message.Subject = subject;
 
-        var template = await File.ReadAllTextAsync(path);
+        var template = await File.ReadAllTextAsync(path, cancellationToken);
 
         var messageBody = template.Replace("{{Name}}", name)
                        .Replace("{{Code}}", code);
@@ -37,16 +39,16 @@ public class Sender
         var client = new SmtpClient();
 
         // Connect to Gmail SMTP server
-        await client.ConnectAsync("smtp.gmail.com", 465, true);
+        await client.ConnectAsync("smtp.gmail.com", 465, true, cancellationToken);
 
         // Authenticate using your email and app password
         await client.AuthenticateAsync(_configuration.GetSection("EmailConfiguration:Address").Value,
-            _configuration.GetSection("EmailConfiguration:PassKey").Value);
+            _configuration.GetSection("EmailConfiguration:PassKey").Value, cancellationToken);
 
         // Send the email
-        await client.SendAsync(message);
+        await client.SendAsync(message, cancellationToken);
 
         // Disconnect and quit
-        await client.DisconnectAsync(true);
+        await client.DisconnectAsync(true, cancellationToken);
     }
 }
