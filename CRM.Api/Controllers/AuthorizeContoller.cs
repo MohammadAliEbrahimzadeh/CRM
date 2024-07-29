@@ -106,7 +106,7 @@ public class AuthorizeContoller : ControllerBase
 
         var email = new Sender(_configuration);
 
-        await email.SendEmailAsync("mohammad77.me@gmail.com", "Confirmation", emailTemplatePath, "Asghar", num.ToString());
+        await email.SendEmailAsync("mohammad77.me@gmail.com", "Confirmation", emailTemplatePath, "Asghar", num.ToString(), cancellation);
 
         return Ok();
     }
