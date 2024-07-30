@@ -90,6 +90,11 @@ internal static class DependencyInjection
                 {
                     e.ConfigureConsumer<NotificationConsumer>(context);
                 });
+
+                cfg.UseMessageRetry(configuration =>
+                {
+                    configuration.Interval(5, TimeSpan.FromSeconds(10));
+                });
             });
         });
 
@@ -100,9 +105,9 @@ internal static class DependencyInjection
             .WriteTo.MongoDB(configuration.GetSection("Mongo:Connection").Value!, configuration.GetSection("Mongo:Collection").Value!)
             .WriteTo.File(
                     path: "logs/log.txt",
-                    rollingInterval: Serilog.RollingInterval.Day,  
-                    retainedFileCountLimit: 30,  
-                    fileSizeLimitBytes: 10 * 1024 * 1024,  
+                    rollingInterval: Serilog.RollingInterval.Day,
+                    retainedFileCountLimit: 30,
+                    fileSizeLimitBytes: 10 * 1024 * 1024,
                     restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error)
             .MinimumLevel.Error()
             .CreateLogger();
