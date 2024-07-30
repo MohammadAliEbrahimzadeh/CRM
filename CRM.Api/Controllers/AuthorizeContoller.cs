@@ -47,43 +47,9 @@ public class AuthorizeContoller : ControllerBase
     }
 
     [HttpPost]
-    [Route("SendEmail")]
-    public async Task<IActionResult> SendEmail(CancellationToken cancellation)
+    [Route("ExceptionTest")]
+    public async Task<IActionResult> ExceptionTest(CancellationToken cancellationToken)
     {
-        var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "Confirmation.html");
-
-        if (!Path.Exists(emailTemplatePath))
-        {
-            return BadRequest();
-        }
-
-        var rnd = new Random();
-
-        var num = rnd.Next(10000, 99999);
-
-        //var email = new Sender(_configuration);
-
-        //await email.SendEmailAsync("mohammad77.me@gmail.com", "Confirmation", emailTemplatePath, "Asghar", num.ToString(), cancellation);
-
-        return Ok();
-    }
-
-    [HttpPost]
-    [Route("RabbitMqTest")]
-    public async Task<IActionResult> RabbitMqTest(CancellationToken cancellationToken)
-    {
-        var rnd = new Random();
-        var num = rnd.Next(10000, 99999);
-
-        await _publishEndpoint.Publish(new RabbitMessageDto()
-        {
-            ChannelType = Models.Enums.ChannelType.Email,
-            Code = num,
-            Email = "mohammad77.me@gmail.com",
-            NotificationType = Models.Enums.NotificationType.EmailConfirmation,
-            Username = "Mohammad"
-        }, cancellationToken);
-
-        return Ok();
+        throw new Exception("this is test");
     }
 }

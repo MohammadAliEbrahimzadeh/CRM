@@ -20,6 +20,7 @@ obj/
 *.sln.docstates
 
 # Ignore logs
+logs/
 *.log
 
 # Ignore temporary files

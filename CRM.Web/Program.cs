@@ -14,7 +14,8 @@ builder.Services
     .InjectFluentValidation()
     .InjectBusinesses()
     .InjectUnitOfWork()
-    .InjectMassTransit(builder.Configuration);
+    .InjectMassTransit(builder.Configuration)
+    .InjectLogger(builder.Configuration);
 
 var app = builder.Build();
 
@@ -23,6 +24,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandler>();
 
 app.UseWebSockets();
 

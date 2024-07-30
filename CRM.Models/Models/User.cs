@@ -12,6 +12,8 @@ public partial class User : BaseEntity<int>
 
     public string? PasswordSalt { get; set; }
 
+    //public bool EmailConfirmed { get; set; }
+
 }
 
 

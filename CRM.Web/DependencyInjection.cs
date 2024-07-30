@@ -15,6 +15,8 @@ using CRM.Business.Businesses;
 using CRM.DataAccess.UnitOfWork;
 using MassTransit;
 using CRM.Common.Consumers;
+using Serilog.Sinks.MongoDB;
+using Serilog;
 
 namespace CRM.Web;
 
@@ -59,7 +61,8 @@ internal static class DependencyInjection
         services
         .AddHealthChecks()
         .AddDbContextCheck<CRMContext>("CRMContext", HealthStatus.Unhealthy)
-        .AddRedis(configuration.GetSection("RedisConfiguration:Connection").Value!, "Redis", HealthStatus.Unhealthy).Services;
+        .AddRedis(configuration.GetSection("RedisConfiguration:Connection").Value!, "Redis", HealthStatus.Unhealthy)
+        .AddMongoDb(configuration.GetSection("Mongo:Connection").Value!).Services;
 
     internal static IServiceCollection InjectFluentValidation(this IServiceCollection services) =>
         services.AddValidatorsFromAssemblyContaining<AddUserDto>().AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
@@ -90,4 +93,27 @@ internal static class DependencyInjection
             });
         });
 
+    internal static IServiceCollection InjectLogger(this IServiceCollection services, IConfiguration configuration)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .WriteTo.MongoDB(configuration.GetSection("Mongo:Connection").Value!, configuration.GetSection("Mongo:Collection").Value!)
+            .WriteTo.File(
+                    path: "logs/log.txt",
+                    rollingInterval: Serilog.RollingInterval.Day,  
+                    retainedFileCountLimit: 30,  
+                    fileSizeLimitBytes: 10 * 1024 * 1024,  
+                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error)
+            .MinimumLevel.Error()
+            .CreateLogger();
+
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.ClearProviders();
+            loggingBuilder.AddSerilog();
+        });
+
+        return services;
+
+    }
 }
