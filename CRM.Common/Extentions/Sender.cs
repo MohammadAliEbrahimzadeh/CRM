@@ -1,6 +1,9 @@
-﻿using MailKit.Net.Smtp;
+﻿using CRM.Models.Enums;
+using MailKit.Net.Smtp;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
+using System.Xml.Linq;
 
 namespace CRM.Common.Extentions;
 
@@ -14,8 +17,8 @@ public class Sender
     }
 
     public async Task SendEmailAsync
-        
-        (string toAddress, string subject, string path, string name, string code, CancellationToken cancellationToken)
+
+        (string toAddress, string subject, string path, string name, string? code)
     {
         var message = new MimeMessage();
 
@@ -25,30 +28,25 @@ public class Sender
 
         message.Subject = subject;
 
-        var template = await File.ReadAllTextAsync(path, cancellationToken);
+        var template = await File.ReadAllTextAsync(path);
 
-        var messageBody = template.Replace("{{Name}}", name)
-                       .Replace("{{Code}}", code);
-
-        message.Body = new TextPart("html")
-        {
-            Text = messageBody
-        };
+        var messageBody = !string.IsNullOrEmpty(code)
+              ? template.Replace("{{Name}}", name).Replace("{{Code}}", code)
+              : template.Replace("{{Name}}", name);
 
         // Connect and send the email using Gmail's SMTP server
         var client = new SmtpClient();
 
         // Connect to Gmail SMTP server
-        await client.ConnectAsync("smtp.gmail.com", 465, true, cancellationToken);
+        await client.ConnectAsync("smtp.gmail.com", 465, true);
 
         // Authenticate using your email and app password
         await client.AuthenticateAsync(_configuration.GetSection("EmailConfiguration:Address").Value,
-            _configuration.GetSection("EmailConfiguration:PassKey").Value, cancellationToken);
+            _configuration.GetSection("EmailConfiguration:PassKey").Value);
 
         // Send the email
-        await client.SendAsync(message, cancellationToken);
-
+        await client.SendAsync(message);
         // Disconnect and quit
-        await client.DisconnectAsync(true, cancellationToken);
+        await client.DisconnectAsync(true);
     }
 }

@@ -13,6 +13,8 @@ using FluentValidation.AspNetCore;
 using CRM.Business.Contracts;
 using CRM.Business.Businesses;
 using CRM.DataAccess.UnitOfWork;
+using MassTransit;
+using CRM.Common.Consumers;
 
 namespace CRM.Web;
 
@@ -67,4 +69,25 @@ internal static class DependencyInjection
 
     internal static IServiceCollection InjectUnitOfWork(this IServiceCollection services) =>
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+    internal static IServiceCollection InjectMassTransit(this IServiceCollection services, IConfiguration configuration) =>
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumer<NotificationConsumer>();
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(configuration.GetSection("RabbitMQ:Host").Value, "/", h =>
+                {
+                    h.Username(configuration.GetSection("RabbitMQ:Username").Value!);
+                    h.Password(configuration.GetSection("RabbitMQ:Password").Value!);
+                });
+
+                cfg.ReceiveEndpoint("Notifications", e =>
+                {
+                    e.ConfigureConsumer<NotificationConsumer>(context);
+                });
+            });
+        });
+
 }

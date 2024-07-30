@@ -13,7 +13,8 @@ builder.Services
     .InjectHealthCheck(builder.Configuration)
     .InjectFluentValidation()
     .InjectBusinesses()
-    .InjectUnitOfWork();
+    .InjectUnitOfWork()
+    .InjectMassTransit(builder.Configuration);
 
 var app = builder.Build();
 
