@@ -58,7 +58,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
 
         var number = rnd.Next(10000, 99999);
 
-        await AddTwoFactorToRedis(dto.Username!, new RedisDto()
+        await AddToRedis(dto.Username!, new RedisDto()
         {
             Code = number,
             CreatedAt = DateTime.Now
@@ -97,7 +97,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
             }).ToList()
         };
 
-        await SubscribeToUser(userDto, cancellationToken);
+        await SubscribeToEvent("UserDto", userDto, cancellationToken);
 
         return new CustomResponse()
         {
@@ -106,9 +106,9 @@ public class AuthorizeBusiness : IAuthorizeBusiness
         };
     }
 
-    private async Task AddTwoFactorToRedis(string key, RedisDto dto, CancellationToken cancellationToken)
+    private async Task AddToRedis<T>(string key, T t, CancellationToken cancellationToken)
     {
-        var jsonData = JsonSerializer.Serialize(dto);
+        var jsonData = JsonSerializer.Serialize(t);
 
         var cacheOptions = new DistributedCacheEntryOptions
         {
@@ -118,8 +118,8 @@ public class AuthorizeBusiness : IAuthorizeBusiness
         await _cache.SetStringAsync(key, jsonData, cacheOptions, cancellationToken);
     }
 
-    private async Task SubscribeToUser(UserDto dto, CancellationToken cancellationToken)
+    private async Task SubscribeToEvent<T>(string topic, T t, CancellationToken cancellationToken)
     {
-        await _eventSender.SendAsync("OnUserCreated", dto, cancellationToken);
+        await _eventSender.SendAsync(topic, t, cancellationToken);
     }
 }
