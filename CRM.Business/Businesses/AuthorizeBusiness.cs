@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using CRM.Common.DTOs.RabbitMessage;
 using HotChocolate.Subscriptions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CRM.Business.Businesses;
 
@@ -29,45 +30,6 @@ public class AuthorizeBusiness : IAuthorizeBusiness
         _unitOfWork = (UnitOfWork)unitOfWork;
         _publishEndpoint = publishEndpoint;
         _eventSender = eventSender;
-    }
-
-    public async Task AddToRedis(string username, CancellationToken cancellationToken)
-    {
-        var rnd = new Random();
-
-        var redisData = new RedisDto()
-        {
-            Code = rnd.Next(10000, 99999),
-            CreatedAt = DateTime.Now,
-        };
-
-        var jsonData = JsonSerializer.Serialize(redisData);
-
-        var cacheOptions = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-        };
-
-        await _cache.SetStringAsync(username, jsonData, cacheOptions, cancellationToken);
-    }
-
-    public async Task<RedisDto> GetFromRedis(string username, CancellationToken cancellationToken)
-    {
-        var redisData = await _cache.GetStringAsync(username, cancellationToken);
-
-        if (redisData is null)
-        {
-            return new RedisDto();
-        }
-
-        var test = JsonSerializer.Deserialize<RedisDto>(redisData);
-
-        if (test is null || test.CreatedAt.AddMinutes(2) <= DateTime.Now)
-        {
-            return new RedisDto();
-        }
-
-        return test;
     }
 
     public async Task<CustomResponse> SignUpAsync(AddUserDto dto, CancellationToken cancellationToken)
@@ -96,20 +58,11 @@ public class AuthorizeBusiness : IAuthorizeBusiness
 
         var number = rnd.Next(10000, 99999);
 
-        var redisData = new RedisDto()
+        await AddTwoFactorToRedis(dto.Username!, new RedisDto()
         {
             Code = number,
-            CreatedAt = DateTime.Now,
-        };
-
-        var jsonData = JsonSerializer.Serialize(redisData);
-
-        var cacheOptions = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-        };
-
-        await _cache.SetStringAsync(dto.Username!, jsonData, cacheOptions, cancellationToken);
+            CreatedAt = DateTime.Now
+        }, cancellationToken);
 
         await _publishEndpoint.Publish(new RabbitMessageDto()
         {
@@ -144,12 +97,29 @@ public class AuthorizeBusiness : IAuthorizeBusiness
             }).ToList()
         };
 
-        await _eventSender.SendAsync("OnUserCreated", user, cancellationToken);
+        await SubscribeToUser(userDto, cancellationToken);
 
         return new CustomResponse()
         {
             Code = HttpStatusCode.OK,
             Message = "User is Created"
         };
+    }
+
+    private async Task AddTwoFactorToRedis(string key, RedisDto dto, CancellationToken cancellationToken)
+    {
+        var jsonData = JsonSerializer.Serialize(dto);
+
+        var cacheOptions = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        };
+
+        await _cache.SetStringAsync(key, jsonData, cacheOptions, cancellationToken);
+    }
+
+    private async Task SubscribeToUser(UserDto dto, CancellationToken cancellationToken)
+    {
+        await _eventSender.SendAsync("OnUserCreated", dto, cancellationToken);
     }
 }
