@@ -1,4 +1,5 @@
 ﻿using CRM.Business.Contracts;
+using CRM.Common.DTOs;
 using CRM.Common.DTOs.Authentication;
 using CRM.Common.DTOs.RabbitMessage;
 using CRM.Common.Extentions;
@@ -32,40 +33,11 @@ public class AuthorizeContoller : ControllerBase
 
     [HttpPost]
     [Route("SignUp")]
-    public async Task<IActionResult> SignUpAsync(AddUserDto dto, CancellationToken cancellationToken)
+    public async Task<CustomResponse> SignUpAsync(AddUserDto dto, CancellationToken cancellationToken)
     {
         try
         {
-            var salt = Generators.RandomString(5);
-
-            var user = new User()
-            {
-                Email = dto.Email,
-                Username = dto.Username,
-                PasswordHash = Generators.HashPassword(dto.Password!, salt),
-                PasswordSalt = salt,
-            };
-
-            await _context.Users!.AddAsync(user, cancellationToken);
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            var userDto = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Username = user.Username,
-                UserRoles = user.UserRoles!.Select(ur => new UserRoleDto
-                {
-                    RoleId = ur.RoleId
-                }).ToList()
-            };
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            await _eventSender.SendAsync("OnUserCreated", user, cancellationToken);
-
-            return Ok();
+            return await _authorizeBusiness.SignUpAsync(dto, cancellationToken);
         }
         catch (Exception ex)
         {

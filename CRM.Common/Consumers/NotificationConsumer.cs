@@ -48,7 +48,10 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
             await emailSender.SendEmailAsync(toAddress, subject, emailTemplatePath, name, code);
         }
 
-        throw new Exception("Template Not Found");
+        else
+        {
+            throw new Exception("Template Not Found");
+        }
 
     }
 }

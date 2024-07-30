@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CRM.DataAccess.Context;
 
 namespace CRM.DataAccess.UnitOfWork;
 
 public class UnitOfWork : BaseUnitOfWork
 {
-    //private CompanyRepository? _companyRepository;
+    private readonly CRMContext _context;
+    private UserRepository? _userRepository;
 
+    public UnitOfWork(CRMContext context) : base(context)
+    {
+        _context = context;
+    }
 
-
-
-    //public CompanyRepository CompanyRepository => _companyRepository ??= new CompanyRepository(_sspLabelsContext, _configuration);
+    public UserRepository UserRepository => _userRepository ??= new UserRepository(_context);
 }

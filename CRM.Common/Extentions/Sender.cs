@@ -34,6 +34,11 @@ public class Sender
               ? template.Replace("{{Name}}", name).Replace("{{Code}}", code)
               : template.Replace("{{Name}}", name);
 
+        message.Body = new TextPart("html")
+        {
+            Text = messageBody
+        };
+
         // Connect and send the email using Gmail's SMTP server
         var client = new SmtpClient();
 
