@@ -43,7 +43,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
                 Message = "Username Is Taken"
             };
 
-        var userExistsByEmail = await _unitOfWork.UserRepository.UserExistsByEmailAsync(dto.Username!, cancellationToken);
+        var userExistsByEmail = await _unitOfWork.UserRepository.UserExistsByEmailAsync(dto.Email!, cancellationToken);
 
         if (userExistsByEmail)
             return new CustomResponse()
@@ -106,6 +106,9 @@ public class AuthorizeBusiness : IAuthorizeBusiness
         };
     }
 
+
+    #region [Private Method[s]]
+
     private async Task AddToRedis<T>(string key, T t, CancellationToken cancellationToken)
     {
         var jsonData = JsonSerializer.Serialize(t);
@@ -122,4 +125,6 @@ public class AuthorizeBusiness : IAuthorizeBusiness
     {
         await _eventSender.SendAsync(topic, t, cancellationToken);
     }
+
+    #endregion
 }
