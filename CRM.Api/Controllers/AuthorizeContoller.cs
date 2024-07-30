@@ -47,25 +47,6 @@ public class AuthorizeContoller : ControllerBase
     }
 
     [HttpPost]
-    [Route("AddToRedis")]
-    public async Task<IActionResult> AddToRedis(string username, CancellationToken cancellation)
-    {
-        await _authorizeBusiness.AddToRedis(username, cancellation);
-
-        return Ok();
-    }
-
-
-    [HttpGet]
-    [Route("GetFromRedis")]
-    public async Task<IActionResult> GetFromRedis(string username, CancellationToken cancellation)
-    {
-        var result = await _authorizeBusiness.GetFromRedis(username, cancellation);
-
-        return Ok(result);
-    }
-
-    [HttpPost]
     [Route("SendEmail")]
     public async Task<IActionResult> SendEmail(CancellationToken cancellation)
     {
