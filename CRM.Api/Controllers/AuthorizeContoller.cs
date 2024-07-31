@@ -47,6 +47,36 @@ public class AuthorizeContoller : ControllerBase
     }
 
     [HttpPost]
+    [Route("VerifyCredentials")]
+    public async Task<CustomResponse> VerifyCredentialsAsync(LoginDto dto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _authorizeBusiness.VerifyCredentialsAsync(dto, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+
+    [HttpPut]
+    [Route("VerifyEmail")]
+    public async Task<CustomResponse> VerifyEmailAsync(VerifyEmailDto dto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _authorizeBusiness.VerifyEmailAsync(dto, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+
+    [HttpPost]
     [Route("ExceptionTest")]
     public async Task<IActionResult> ExceptionTest(CancellationToken cancellationToken)
     {

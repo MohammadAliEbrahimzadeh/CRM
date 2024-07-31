@@ -32,6 +32,9 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
                 break;
             case NotificationType.PasswordChange:
                 break;
+            case NotificationType.LoginTwoFactor:
+                await SendLoginTwoFactorEnail(message.Email!, "Login Two Factor Code", message.Username!, message.Code.ToString()!);
+                break;
             default:
                 break;
         }
@@ -40,6 +43,24 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
     private async Task SendConfirmationEnail(string toAddress, string subject, string name, string code)
     {
         var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "Confirmation.html");
+
+        if (File.Exists(emailTemplatePath))
+        {
+            var emailSender = new Sender(_configuration);
+
+            await emailSender.SendEmailAsync(toAddress, subject, emailTemplatePath, name, code);
+        }
+
+        else
+        {
+            throw new Exception("Template Not Found");
+        }
+
+    }
+
+    private async Task SendLoginTwoFactorEnail(string toAddress, string subject, string name, string code)
+    {
+        var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "TwoFactorLogin.html");
 
         if (File.Exists(emailTemplatePath))
         {

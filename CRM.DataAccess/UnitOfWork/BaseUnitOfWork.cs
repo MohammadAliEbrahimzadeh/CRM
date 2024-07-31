@@ -16,6 +16,11 @@ public class BaseUnitOfWork : IUnitOfWork
         await _context.Set<T>().AddAsync(entity, cancellationToken);
     }
 
+    public void Update<T>(T entity) where T : class
+    {
+        _context.Set<T>().Update(entity);
+    }
+
     public int Commit()
     {
         throw new NotImplementedException();
