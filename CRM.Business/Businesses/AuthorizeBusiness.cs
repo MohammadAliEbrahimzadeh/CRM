@@ -56,7 +56,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
 
         var rnd = new Random();
 
-        var number = rnd.Next(10000, 99999);
+        var number = rnd.Next(100000, 999999);
 
         await AddToRedis(dto.Username!, new RedisDto()
         {
@@ -97,7 +97,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
             }).ToList()
         };
 
-        await SubscribeToEvent("UserDto", userDto, cancellationToken);
+        await SubscribeToEvent("OnUserCreated", userDto, cancellationToken);
 
         return new CustomResponse()
         {
