@@ -14,7 +14,7 @@ namespace CRM.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthorizeContoller : ControllerBase
+public class AuthorizeController : ControllerBase
 {
     private readonly CRMContext _context;
     private readonly ITopicEventSender _eventSender;
@@ -22,7 +22,7 @@ public class AuthorizeContoller : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly IPublishEndpoint _publishEndpoint;
 
-    public AuthorizeContoller(CRMContext context, ITopicEventSender eventSender, IAuthorizeBusiness authorizeBusiness, IConfiguration configuration, IPublishEndpoint publishEndpoint)
+    public AuthorizeController(CRMContext context, ITopicEventSender eventSender, IAuthorizeBusiness authorizeBusiness, IConfiguration configuration, IPublishEndpoint publishEndpoint)
     {
         _context = context;
         _eventSender = eventSender;
@@ -48,17 +48,9 @@ public class AuthorizeContoller : ControllerBase
 
     [HttpPost]
     [Route("VerifyCredentials")]
-    public async Task<CustomResponse> VerifyCredentialsAsync(LoginDto dto, CancellationToken cancellationToken)
+    public async Task<CustomResponse> VerifyCredentialsAsync(CredentialsDto dto, CancellationToken cancellationToken)
     {
-        try
-        {
-            return await _authorizeBusiness.VerifyCredentialsAsync(dto, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-
-            throw;
-        }
+        return await _authorizeBusiness.VerifyCredentialsAsync(dto, cancellationToken);
     }
 
     [HttpPut]

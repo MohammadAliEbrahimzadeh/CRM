@@ -24,7 +24,7 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
             case NotificationType.ForgotPassword:
                 break;
             case NotificationType.EmailConfirmation:
-                await SendConfirmationEnail(message.Email!, "Confirmation", message.Username!, message.Code.ToString()!);
+                await SendConfirmationEmail(message.Email!, "Confirmation", message.Username!, message.Code.ToString()!);
                 break;
             case NotificationType.SalesUpdate:
                 break;
@@ -33,14 +33,14 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
             case NotificationType.PasswordChange:
                 break;
             case NotificationType.LoginTwoFactor:
-                await SendLoginTwoFactorEnail(message.Email!, "Login Two Factor Code", message.Username!, message.Code.ToString()!);
+                await SendLoginTwoFactorEmail(message.Email!, "Login Two Factor Code", message.Username!, message.Code.ToString()!);
                 break;
             default:
                 break;
         }
     }
 
-    private async Task SendConfirmationEnail(string toAddress, string subject, string name, string code)
+    private async Task SendConfirmationEmail(string toAddress, string subject, string name, string code)
     {
         var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "Confirmation.html");
 
@@ -58,7 +58,7 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
 
     }
 
-    private async Task SendLoginTwoFactorEnail(string toAddress, string subject, string name, string code)
+    private async Task SendLoginTwoFactorEmail(string toAddress, string subject, string name, string code)
     {
         var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "TwoFactorLogin.html");
 

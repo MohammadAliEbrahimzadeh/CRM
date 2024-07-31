@@ -2,7 +2,7 @@
 
 namespace CRM.Common.DTOs.Authentication;
 
-public class LoginDto
+public class CredentialsDto
 {
     public string? Username { get; set; }
 

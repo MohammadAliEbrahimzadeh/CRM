@@ -8,7 +8,7 @@ public interface IAuthorizeBusiness
 {
     Task<CustomResponse> SignUpAsync(AddUserDto dto, CancellationToken cancellationToken);
 
-    Task<CustomResponse> VerifyCredentialsAsync(LoginDto dto, CancellationToken cancellationToken);
+    Task<CustomResponse> VerifyCredentialsAsync(CredentialsDto dto, CancellationToken cancellationToken);
 
     Task<CustomResponse> VerifyEmailAsync(VerifyEmailDto dto, CancellationToken cancellationToken);
 }

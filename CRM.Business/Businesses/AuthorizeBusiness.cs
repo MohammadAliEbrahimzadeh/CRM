@@ -33,7 +33,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
         _eventSender = eventSender;
     }
 
-    public async Task<CustomResponse> VerifyCredentialsAsync(LoginDto dto, CancellationToken cancellationToken)
+    public async Task<CustomResponse> VerifyCredentialsAsync(CredentialsDto dto, CancellationToken cancellationToken)
     {
         var user = await _unitOfWork.UserRepository.GetByUsernameAsync(dto.Username!, cancellationToken);
 
@@ -57,7 +57,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
             return new CustomResponse()
             {
                 Code = HttpStatusCode.NoContent,
-                Message = "No User Was Found"
+                Message = "User Email Is Not Confirmed"
             };
 
         var hash = Generators.HashPassword(dto.Password!, user.PasswordSalt!);

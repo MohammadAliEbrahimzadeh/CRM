@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace CRM.Common.Validators;
 
-public class LoginDtoValidator : AbstractValidator<LoginDto>
+public class CredentialsDtoValidator : AbstractValidator<CredentialsDto>
 {
-    public LoginDtoValidator()
+    public CredentialsDtoValidator()
     {
         RuleFor(x => x.Username)
             .NotEmpty()
