@@ -222,7 +222,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
 
     public async Task<CustomResponse> SignInAsync(SignInDto dto, CancellationToken cancellationToken)
     {
-        var user = await _unitOfWork.UserRepository.GetByUsernameAsync(dto.Username!, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetRolesByUsernameAsync(dto.Username!, cancellationToken);
 
         if (user is null)
             return new CustomResponse()

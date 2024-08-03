@@ -95,7 +95,7 @@ public class AuthorizeController : ControllerBase
     [HttpPost]
     [Route("ClaimsTest")]
     [Authorize]
-    public IActionResult ExceptionTest(int? id, CancellationToken cancellationToken)
+    public IActionResult ClaimsTest(int? id, CancellationToken cancellationToken)
     {
         var claims = HttpContext.User.Claims;
 
