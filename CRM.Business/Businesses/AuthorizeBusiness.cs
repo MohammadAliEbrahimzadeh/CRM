@@ -222,6 +222,15 @@ public class AuthorizeBusiness : IAuthorizeBusiness
 
     public async Task<CustomResponse> SignInAsync(SignInDto dto, CancellationToken cancellationToken)
     {
+        var user = await _unitOfWork.UserRepository.GetByUsernameAsync(dto.Username!, cancellationToken);
+
+        if (user is null)
+            return new CustomResponse()
+            {
+                Code = HttpStatusCode.NoContent,
+                Message = "No Data Was Found"
+            };
+
         var result = await _cache.GetStringAsync(dto.Username!, cancellationToken);
 
         if (result is null)
@@ -248,7 +257,12 @@ public class AuthorizeBusiness : IAuthorizeBusiness
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        claims.AddClaim(new(ClaimTypes.Role, "Visitor"));
+        foreach (var item in user.UserRoles!)
+        {
+            claims.AddClaim(new(ClaimTypes.Role, item.Role!.Name!));
+        }
+
+        claims.AddClaim(new(ClaimTypes.Name, dto.Username!));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -257,6 +271,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
             SigningCredentials = creds,
             Audience = _configuration.GetSection("Jwt:Audience").Value!,
             Issuer = _configuration.GetSection("Jwt:Issuer").Value!,
+            IssuedAt = DateTime.Now,
         };
 
         var jwtHandler = new JwtSecurityTokenHandler();
