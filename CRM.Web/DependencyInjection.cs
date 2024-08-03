@@ -77,6 +77,7 @@ internal static class DependencyInjection
         .AddType<UserRoleType>()
         .AddProjections()
         .AddFiltering()
+        .AddSorting()
         .AddSubscriptionType<UserSubscription>()
         .AddRedisSubscriptions((sp) => ConnectionMultiplexer.Connect("localhost:6379"))
         .Services;

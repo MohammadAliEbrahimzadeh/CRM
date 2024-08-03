@@ -20,4 +20,6 @@ public partial class User : BaseEntity<int>
 public partial class User
 {
     public virtual ICollection<UserRole>? UserRoles { get; set; } = new HashSet<UserRole>();
+
+    public virtual ICollection<Sale>? Sales { get; set; } = new HashSet<Sale>();
 }

@@ -9,5 +9,5 @@ public class UserSubscription
 {
     [Subscribe]
     [Topic("OnUserCreated")]
-    public AddUserDto OnUserCreated([EventMessage] AddUserDto user) => user;
+    public UserDto OnUserCreated([EventMessage] UserDto user) => user;
 }
