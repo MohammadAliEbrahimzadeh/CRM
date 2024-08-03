@@ -5,6 +5,7 @@ using CRM.Common.DTOs.RabbitMessage;
 using CRM.Common.Extentions;
 using CRM.DataAccess.Context;
 using CRM.Models.Models;
+using HotChocolate.Authorization;
 using HotChocolate.Subscriptions;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,21 @@ public class AuthorizeController : ControllerBase
     }
 
     [HttpPost]
+    [Route("SignIn")]
+    public async Task<CustomResponse> SignInAsync(SignInDto dto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _authorizeBusiness.SignInAsync(dto, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+
+    [HttpPost]
     [Route("VerifyCredentials")]
     public async Task<CustomResponse> VerifyCredentialsAsync(CredentialsDto dto, CancellationToken cancellationToken)
     {
@@ -73,5 +89,16 @@ public class AuthorizeController : ControllerBase
     public async Task<IActionResult> ExceptionTest(CancellationToken cancellationToken)
     {
         throw new Exception("this is test");
+    }
+
+
+    [HttpPost]
+    [Route("ClaimsTest")]
+    [Authorize]
+    public IActionResult ExceptionTest(int? id, CancellationToken cancellationToken)
+    {
+        var claims = HttpContext.User.Claims;
+
+        return Ok();
     }
 }

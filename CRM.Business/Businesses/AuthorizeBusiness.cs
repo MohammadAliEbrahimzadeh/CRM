@@ -15,6 +15,12 @@ using CRM.Common.DTOs.RabbitMessage;
 using HotChocolate.Subscriptions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.Json.Serialization;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CRM.Business.Businesses;
 
@@ -23,14 +29,16 @@ public class AuthorizeBusiness : IAuthorizeBusiness
     private readonly IDistributedCache _cache;
     private readonly UnitOfWork _unitOfWork;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IConfiguration _configuration;
     private readonly ITopicEventSender _eventSender;
 
-    public AuthorizeBusiness(IDistributedCache cache, IUnitOfWork unitOfWork, IPublishEndpoint publishEndpoint, ITopicEventSender eventSender)
+    public AuthorizeBusiness(IDistributedCache cache, IUnitOfWork unitOfWork, IPublishEndpoint publishEndpoint, ITopicEventSender eventSender, IConfiguration configuration)
     {
         _cache = cache;
         _unitOfWork = (UnitOfWork)unitOfWork;
         _publishEndpoint = publishEndpoint;
         _eventSender = eventSender;
+        _configuration = configuration;
     }
 
     public async Task<CustomResponse> VerifyCredentialsAsync(CredentialsDto dto, CancellationToken cancellationToken)
@@ -209,6 +217,57 @@ public class AuthorizeBusiness : IAuthorizeBusiness
         {
             Code = HttpStatusCode.OK,
             Message = "Email Confirmed"
+        };
+    }
+
+    public async Task<CustomResponse> SignInAsync(SignInDto dto, CancellationToken cancellationToken)
+    {
+        var result = await _cache.GetStringAsync(dto.Username!, cancellationToken);
+
+        if (result is null)
+            return new CustomResponse()
+            {
+                Code = HttpStatusCode.NoContent,
+                Message = "No Data Was Found"
+            };
+
+        var redisData = JsonSerializer.Deserialize<RedisDto>(result);
+
+        if (redisData!.Code != dto.Code)
+            return new CustomResponse()
+            {
+                Code = HttpStatusCode.Conflict,
+                Message = "Wrong Code"
+            };
+
+        await _cache.RemoveAsync(dto.Username!, cancellationToken);
+
+        var claims = new ClaimsIdentity();
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("Jwt:Key").Value!));
+
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        claims.AddClaim(new(ClaimTypes.Role, "Visitor"));
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = claims,
+            Expires = DateTime.Now.AddDays(1),
+            SigningCredentials = creds,
+            Audience = _configuration.GetSection("Jwt:Audience").Value!,
+            Issuer = _configuration.GetSection("Jwt:Issuer").Value!,
+        };
+
+        var jwtHandler = new JwtSecurityTokenHandler();
+
+        var token = jwtHandler.CreateToken(tokenDescriptor);
+
+        return new CustomResponse()
+        {
+            Data = new JwtSecurityTokenHandler().WriteToken(token),
+            Code = HttpStatusCode.OK,
+            Message = "SignIn Was Successful"
         };
     }
 

@@ -17,6 +17,10 @@ using MassTransit;
 using CRM.Common.Consumers;
 using Serilog.Sinks.MongoDB;
 using Serilog;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace CRM.Web;
 
@@ -36,7 +40,34 @@ internal static class DependencyInjection
                 .Services;
 
     internal static IServiceCollection InjectAddSwaggerGen(this IServiceCollection services) =>
-       services.AddSwaggerGen();
+       services.AddSwaggerGen(c =>
+       {
+           c.SwaggerDoc("v1", new OpenApiInfo { Title = "CRM", Version = "v1" });
+
+           c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+           {
+               Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+               Name = "Authorization",
+               In = ParameterLocation.Header,
+               Type = SecuritySchemeType.ApiKey,
+               Scheme = "Bearer"
+           });
+
+           c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+       });
 
     internal static IServiceCollection InjectHotChocolate(this IServiceCollection services) =>
       services
@@ -121,4 +152,27 @@ internal static class DependencyInjection
         return services;
 
     }
+
+    internal static IServiceCollection InjectAuthentication(this IServiceCollection services, IConfiguration configuration) =>
+        services
+            .AddAuthentication(options =>
+             {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+            {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = configuration.GetSection("Jwt:Issuer").Value!,
+            ValidAudience = configuration.GetSection("Jwt:Audience").Value!,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("Jwt:Key").Value!))
+            };
+            }).Services;
 }
