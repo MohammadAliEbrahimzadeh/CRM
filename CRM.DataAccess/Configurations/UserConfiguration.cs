@@ -20,6 +20,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder
+            .HasMany(x => x.Sales)
+            .WithOne(x => x.User)
+            .HasForeignKey(fk => fk.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder
             .HasQueryFilter(p => !p.IsDeleted);
 
         builder

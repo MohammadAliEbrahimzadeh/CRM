@@ -13,4 +13,9 @@ public partial class Company : BaseEntity<int>
     public string? NationalCode { get; set; }
 }
 
+public partial class Company
+{
+    public ICollection<Sale>? Sales { get; set; } = new HashSet<Sale>();
+}
+
 
