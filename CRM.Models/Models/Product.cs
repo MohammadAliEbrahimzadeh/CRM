@@ -2,6 +2,11 @@
 
 namespace CRM.Models.Models;
 
-public class Product : BaseEntity<int>
+public partial class Product : BaseEntity<int>
 {
+}
+
+public partial class Product
+{
+    public string? Name { get; set; }
 }

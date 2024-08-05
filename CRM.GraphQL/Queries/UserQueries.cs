@@ -8,7 +8,7 @@ namespace CRM.GraphQL.Queries;
 
 public class UserQueries
 {
-    //[HotChocolate.Authorization.Authorize]
+    [HotChocolate.Authorization.Authorize]
     [UseDbContext(typeof(CRMContext))]
     [UseProjection]
     [UseFiltering]
