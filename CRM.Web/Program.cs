@@ -16,7 +16,8 @@ builder.Services
     .InjectUnitOfWork()
     .InjectMassTransit(builder.Configuration)
     .InjectLogger(builder.Configuration)
-    .InjectAuthentication(builder.Configuration);
+    .InjectAuthentication(builder.Configuration)
+    .InjectHttpContextAccessor();
 
 var app = builder.Build();
 

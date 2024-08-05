@@ -32,6 +32,9 @@ internal static class DependencyInjection
             optionsAction.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
         });
 
+    internal static IServiceCollection InjectHttpContextAccessor(this IServiceCollection services) =>
+       services.AddHttpContextAccessor();
+
     internal static IServiceCollection InjectAddEndpointsApiExplorer(this IServiceCollection services) =>
        services.AddEndpointsApiExplorer();
 
