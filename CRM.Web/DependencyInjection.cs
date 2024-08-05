@@ -76,6 +76,7 @@ internal static class DependencyInjection
       services
         .AddGraphQLServer()
         .AddQueryType<UserQueries>()
+        .AddQueryType<SaleQueries>()
         .AddType<UserType>()
         .AddType<UserRoleType>()
         .AddProjections()
