@@ -1,4 +1,5 @@
-﻿using CRM.DataAccess.Context;
+﻿using CRM.Common.Extensions;
+using CRM.DataAccess.Context;
 using CRM.Models.Models;
 using HotChocolate.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -20,9 +21,9 @@ public class UserQueries
         [FromQuery] int page = 1, [FromQuery] int pageSize = 2)
     {
 
-        var claims = httpContextAccessor.HttpContext!.User.Claims.ToList();
+        var userId = Convert.ToInt32(httpContextAccessor.HttpContext!.GetUserId());
 
-       return context.Users!.Skip((page - 1) * pageSize).Take(pageSize);
+        return context.Users!.Skip((page - 1) * pageSize).Take(pageSize);
     }
-       
+
 }

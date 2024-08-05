@@ -12,5 +12,6 @@ public class UserRoleType : ObjectType<UserRole>
         descriptor.Field(u => u.UpdatedAt).Ignore();
         descriptor.Field(u => u.RoleId).Ignore();
         descriptor.Field(u => u.UserId).Ignore();
+        descriptor.Field(u => u.User).Ignore();
     }
 }

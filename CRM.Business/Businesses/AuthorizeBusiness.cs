@@ -262,7 +262,7 @@ public class AuthorizeBusiness : IAuthorizeBusiness
             claims.AddClaim(new(ClaimTypes.Role, item.Role!.Name!));
         }
 
-        claims.AddClaim(new(ClaimTypes.Name, dto.Username!));
+        claims.AddClaim(new(ClaimTypes.NameIdentifier, user.Id.ToString()!));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
