@@ -75,8 +75,7 @@ internal static class DependencyInjection
     internal static IServiceCollection InjectHotChocolate(this IServiceCollection services) =>
       services
         .AddGraphQLServer()
-        .AddQueryType<UserQueries>()
-        .AddQueryType<SaleQueries>()
+        .AddQueryType<Query>()
         .AddType<UserType>()
         .AddType<UserRoleType>()
         .AddProjections()
@@ -106,6 +105,10 @@ internal static class DependencyInjection
 
     internal static IServiceCollection InjectBusinesses(this IServiceCollection services) =>
         services.AddScoped<IAuthorizeBusiness, AuthorizeBusiness>();
+
+    internal static IServiceCollection InjectGraphQlQueries(this IServiceCollection services) =>
+        services.AddScoped<UserQueries>()
+                .AddScoped<SaleQueries>();
 
     internal static IServiceCollection InjectUnitOfWork(this IServiceCollection services) =>
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -163,22 +166,22 @@ internal static class DependencyInjection
         services
             .AddAuthentication(options =>
              {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+             })
             .AddJwtBearer(options =>
             {
-        options.RequireHttpsMetadata = false;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-            {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = configuration.GetSection("Jwt:Issuer").Value!,
-            ValidAudience = configuration.GetSection("Jwt:Audience").Value!,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("Jwt:Key").Value!))
-            };
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration.GetSection("Jwt:Issuer").Value!,
+                    ValidAudience = configuration.GetSection("Jwt:Audience").Value!,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("Jwt:Key").Value!))
+                };
             }).Services;
 }

@@ -10,11 +10,11 @@ public partial class Sale : BaseEntity<int>
 
     public long Count { get; set; }
 
-    public int? UserId { get; set; }
+    public int UserId { get; set; }
 
-    public int? CompanyId { get; set; }
+    public int CompanyId { get; set; }
 
-    public int? ProductId { get; set; }
+    public int ProductId { get; set; }
 
     public SalesStatus SalesStatus { get; set; }
 }

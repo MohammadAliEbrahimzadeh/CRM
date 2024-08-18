@@ -17,7 +17,8 @@ builder.Services
     .InjectMassTransit(builder.Configuration)
     .InjectLogger(builder.Configuration)
     .InjectAuthentication(builder.Configuration)
-    .InjectHttpContextAccessor();
+    .InjectHttpContextAccessor()
+    .InjectGraphQlQueries();
 
 var app = builder.Build();
 

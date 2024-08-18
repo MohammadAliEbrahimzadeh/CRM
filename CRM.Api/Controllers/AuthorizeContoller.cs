@@ -1,4 +1,5 @@
-﻿using CRM.Business.Contracts;
+﻿using Bogus;
+using CRM.Business.Contracts;
 using CRM.Common.DTOs;
 using CRM.Common.DTOs.Authentication;
 using CRM.Common.DTOs.RabbitMessage;

@@ -5,6 +5,8 @@ namespace CRM.Models.Models;
 public partial class Product : BaseEntity<int>
 {
     public string? Name { get; set; }
+
+    public decimal Price { get; set; }
 }
 
 public partial class Product

@@ -1,4 +1,4 @@
-﻿
+﻿using HotChocolate;
 
 namespace CRM.Models.Models;
 

@@ -1,4 +1,5 @@
-﻿using CRM.DataAccess.Configurations;
+﻿using Bogus;
+using CRM.DataAccess.Configurations;
 using CRM.Models.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,6 @@ public class CRMContext : DbContext
     public DbSet<Sale>? Sales { get; set; }
     public DbSet<Product>? Products { get; set; }
     public DbSet<Company>? Companies { get; set; }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
