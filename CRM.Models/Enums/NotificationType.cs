@@ -8,6 +8,5 @@ public enum NotificationType : short
     EmailConfirmation = 1,
     SalesUpdate = 2,
     AccountActivation = 3,
-    PasswordChange = 4,
     LoginTwoFactor = 5,
 }

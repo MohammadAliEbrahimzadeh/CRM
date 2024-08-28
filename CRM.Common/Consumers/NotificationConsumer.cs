@@ -21,8 +21,6 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
 
         switch (message.NotificationType)
         {
-            case NotificationType.ForgotPassword:
-                break;
             case NotificationType.EmailConfirmation:
                 await SendConfirmationEmail(message.Email!, "Confirmation", message.Username!, message.Code.ToString()!);
                 break;
@@ -30,7 +28,8 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
                 break;
             case NotificationType.AccountActivation:
                 break;
-            case NotificationType.PasswordChange:
+            case NotificationType.ForgotPassword:
+                await SendForgotPasswordEmail(message.Email!, "Forgot Password Factor Code", message.Username!, message.Code.ToString()!);
                 break;
             case NotificationType.LoginTwoFactor:
                 await SendLoginTwoFactorEmail(message.Email!, "Login Two Factor Code", message.Username!, message.Code.ToString()!);
@@ -61,6 +60,24 @@ public class NotificationConsumer : IConsumer<RabbitMessageDto>
     private async Task SendLoginTwoFactorEmail(string toAddress, string subject, string name, string code)
     {
         var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "TwoFactorLogin.html");
+
+        if (File.Exists(emailTemplatePath))
+        {
+            var emailSender = new Sender(_configuration);
+
+            await emailSender.SendEmailAsync(toAddress, subject, emailTemplatePath, name, code);
+        }
+
+        else
+        {
+            throw new Exception("Template Not Found");
+        }
+
+    }
+
+    private async Task SendForgotPasswordEmail(string toAddress, string subject, string name, string code)
+    {
+        var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Template", "Email", "ForgotPassword.html");
 
         if (File.Exists(emailTemplatePath))
         {

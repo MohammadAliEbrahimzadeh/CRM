@@ -22,6 +22,9 @@ public class UserRepository
     public async Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken) =>
         await _context.Users!.SingleOrDefaultAsync(x => x.Username == username, cancellationToken);
 
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken) =>
+      await _context.Users!.SingleOrDefaultAsync(x => x.Email == email, cancellationToken);
+
     public async Task<User?> GetRolesByUsernameAsync(string username, CancellationToken cancellationToken) =>
         await _context.Users!
             .Include(x => x.UserRoles)!

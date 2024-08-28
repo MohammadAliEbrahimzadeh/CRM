@@ -85,21 +85,19 @@ public class AuthorizeController : ControllerBase
         }
     }
 
-    [HttpPost]
-    [Route("ExceptionTest")]
-    public async Task<IActionResult> ExceptionTest(CancellationToken cancellationToken)
+    [HttpPut]
+    [Route("SendForgotPasswordCode")]
+    public async Task<CustomResponse> SendForgotPasswordCodeAsync(VerifyEmailDto dto, CancellationToken cancellationToken)
     {
-        throw new Exception("this is test");
+        try
+        {
+            return await _authorizeBusiness.VerifyEmailAsync(dto, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
     }
 
-
-    [HttpPost]
-    [Route("ClaimsTest")]
-    [Authorize]
-    public IActionResult ClaimsTest(int? id, CancellationToken cancellationToken)
-    {
-        var claims = HttpContext.User.Claims;
-
-        return Ok();
-    }
 }

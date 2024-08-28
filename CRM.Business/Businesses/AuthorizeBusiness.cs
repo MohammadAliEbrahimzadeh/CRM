@@ -286,6 +286,61 @@ public class AuthorizeBusiness : IAuthorizeBusiness
         };
     }
 
+    public async Task<CustomResponse> SendForgotPasswordCodeAsync(SendForgotPasswordEmailDto dto, CancellationToken cancellationToken)
+    {
+        var user = await _unitOfWork.UserRepository.GetByEmailAsync(dto.Email!, cancellationToken);
+
+        if (user is null)
+            return new CustomResponse()
+            {
+                Code = HttpStatusCode.NoContent,
+                Message = "No Data Was Found"
+            };
+
+        var result = await _cache.GetStringAsync(user.Username!, cancellationToken);
+
+        if (result is not null)
+            return new CustomResponse()
+            {
+                Code = HttpStatusCode.NoContent,
+                Message = "Code Is Already Sent"
+            };
+
+        if (!user.EmailConfirmed)
+            return new CustomResponse()
+            {
+                Code = HttpStatusCode.NoContent,
+                Message = "User Email Is Not Confirmed"
+            };
+
+        var rnd = new Random();
+
+        var number = rnd.Next(100000, 999999);
+
+        await AddToRedis(user.Username!, new RedisDto()
+        {
+            Code = number,
+            CreatedAt = DateTime.Now
+        }, cancellationToken);
+
+        await _publishEndpoint.Publish(new RabbitMessageDto()
+        {
+            Code = number,
+            ChannelType = Models.Enums.ChannelType.Email,
+            Email = user.Email,
+            NotificationType = Models.Enums.NotificationType.ForgotPassword,
+            Username = user.Username
+
+        }, cancellationToken);
+
+        return new CustomResponse()
+        {
+            Code = HttpStatusCode.OK,
+            Message = "Code Was Sent"
+        };
+
+    }
+
 
     #region [Private Method[s]]
 

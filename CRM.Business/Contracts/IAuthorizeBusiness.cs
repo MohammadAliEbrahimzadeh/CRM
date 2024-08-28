@@ -13,4 +13,6 @@ public interface IAuthorizeBusiness
     Task<CustomResponse> VerifyCredentialsAsync(CredentialsDto dto, CancellationToken cancellationToken);
 
     Task<CustomResponse> VerifyEmailAsync(VerifyEmailDto dto, CancellationToken cancellationToken);
+
+    Task<CustomResponse> SendForgotPasswordCodeAsync(SendForgotPasswordEmailDto dto, CancellationToken cancellationToken);
 }

@@ -22,14 +22,11 @@ builder.Services
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CRM V1");
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CRM V1");
+});
 
 app.UseAuthentication();
 
