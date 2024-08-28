@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CRM.Models.Enums;
 
-public enum SalesStatus
+public enum SalesStatus : short
 {
     New = 0,
     Pending = 1,

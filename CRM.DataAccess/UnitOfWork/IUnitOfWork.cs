@@ -8,4 +8,6 @@ public interface IUnitOfWork
     Task<int> CommitAsync(CancellationToken cancellationToken = default(CancellationToken));
 
     Task AddAsync<T>(T entity, CancellationToken cancellationTokenn) where T : class;
+
+    void Update<T>(T entity) where T : class;
 }
